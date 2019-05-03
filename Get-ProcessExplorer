@@ -1,0 +1,30 @@
+function get-processexplorer{
+
+    $master = Get-WmiObject win32_process
+    [System.Collections.ArrayList]$ProcessArray = @()
+    $Process = $null
+
+
+    ForEach($item in $master){
+
+        $Process= [PSCustomObject]@{
+
+            Name = $item.ProcessName
+            ID = $item.ProcessId
+            PPID = $item.ParentProcessID
+            CMDLine = $item.CommandLine
+            Path = $item.path
+            ChildName = ""
+            
+        }
+
+    $ProcessArray | ForEach-Object{if($_.ProcessID -eq $Process.PPID){$_ | Set-ItemProperty -Name ChildName -Value $_.ProcessName}}
+
+    $ProcessArray.Add(($Process)) | Out-Null
+   
+
+    }#end foreach
+
+    Return $ProcessArray
+
+}
