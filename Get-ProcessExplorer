@@ -2,10 +2,7 @@ function get-processexplorer{
 
     $master = Get-WmiObject win32_process
     [System.Collections.ArrayList]$ProcessArray = @()
-    [System.Collections.ArrayList]$ProcessArray2 = @()
-    #$Process = $null
-
-
+   
     ForEach($item in $master){
 
         $Process= [PSCustomObject]@{
@@ -15,40 +12,25 @@ function get-processexplorer{
             PPID = $item.ParentProcessID
             CMDLine = $item.CommandLine
             Path = $item.path
+            ParentProcessName = ""  
+            ChildProcessName = ""        
             
-        }
+        }        
+        
+        if($ProcessArray.ID -contains $Process.PPID){
 
-        $Process2= [PSCustomObject]@{
+            $a = (0..($ProcessArray.Count-1)) | where {($ProcessArray[$_]).ID -eq $Process.PPID};
 
-            Name = $item.ProcessName
-            ID = $item.ProcessId
-            PPID = $item.ParentProcessID
-            CMDLine = $item.CommandLine
-            Path = $item.path
+            Add-member -InputObject $ProcessArray[$a] -MemberType NoteProperty -Name "ChildProcessName" -Value $Process.Name -Force
             
-        }
+            Add-member -InputObject $Process -MemberType NoteProperty -Name "ParentProcessName" -Value ($ProcessArray[$a]).Name -Force
+
+        }   
         
-        
-
-
- 
-
-    $ProcessArray.Add(($Process)) | Out-Null
-    $ProcessArray2.Add(($Process2)) | Out-Null
-
-    
-
-    $Process | Add-Member -NotePropertyName Childname -NotePropertyValue $ProcessArray2.name
-
-    ForEach($index in $ProcessArray.ID){where-object{$index -eq $ProcessArray.PPID} ; $Process.ChildName=$ProcessArray.name}
-    
-    #{foreach($index2 in $processarray2){where-object{$_.ID -eq $ProcessArray.PPID};$Process.Childname=$processarray2.name}}
-
-   
-
+        $ProcessArray.Add(($Process)) | Out-Null         
+                 
     }#end foreach
 
     Return $ProcessArray
 
 }
-#foreach ($elem.PPID in $ProcessArray) { if ($ProcessArray2 -contains $elem.ID) { Write-Host "$elem.name" } }
