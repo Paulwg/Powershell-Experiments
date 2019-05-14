@@ -13,7 +13,13 @@ function get-processexplorer{
             CMDLine = $item.CommandLine
             Path = $item.path
             ParentProcessName = ""  
-            ChildProcessName = ""        
+            ChildProcessName = ""
+            UserName = try{
+                            (Get-Process -Name $item.ProcessName -IncludeUserName).UserName 
+                        }
+                        Catch{
+                            "Must be Administrator"
+                        }  
             
         }        
         
