@@ -15,7 +15,7 @@ function get-processexplorer{
             ParentProcessName = ""  
             ChildProcessName = ""
             UserName = try{
-                            (Get-Process -Name $item.ProcessName -IncludeUserName).UserName 
+                            (Get-Process -Name ([io.path]::GetFileNameWithoutExtension($item.ProcessName)) -IncludeUserName).UserName 
                         }
                         Catch{
                             "Must be Administrator"
